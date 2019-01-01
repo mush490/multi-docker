@@ -1,0 +1,22 @@
+sudo: required
+services:
+  - docker
+
+before_insetall:
+  - docker build -t mush490/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run mush490/react-test npm test -- --coverage # "-- -- coverage" is necessary to get npm test to exit properly
+
+after_success:
+  - docker build -t mush490/multi-client -f ./client/Dockerfile ./client
+  - docker build -t mush490/multi-nginx -f ./nginx/Dockerfile ./nginx
+  - docker build -t mush490/multi-server -f ./server/Dockerfile ./server
+  - docker build -t mush490/multi-worker -f ./worker/Dockerfile ./worker
+  # Log in to the docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  # Take these images and push them to docker hub
+  - docker push mush490/multi-client
+  - docker push mush490/multi-nginx
+  - docker push mush490/multi-server
+  - docker push mush490/multi-worker
