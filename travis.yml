@@ -2,7 +2,7 @@ sudo: required
 services:
   - docker
 
-before_insetall:
+before_install:
   - docker build -t mush490/react-test -f ./client/Dockerfile.dev ./client
 
 script:
